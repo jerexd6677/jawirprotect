@@ -1,16 +1,15 @@
 #!/bin/bash
 
-# 🎨 FIX: Terima custom watermark dari parameter
-CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-PROTECT BY LINNSIGMA}}"
-SPECIFIC_PROTECT="${2:-all}"
+# Custom watermark dari parameter
+CUSTOM_WATERMARK="${1:-PROTECT BY LINNSIGMA}"
 
 echo "=================================================="
-echo "🛡️  JEREPROTECTBOT - INSTALL PROTECTION"
+echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
 echo "🔒 Version: 2.0 Premium"
 echo "💫 Watermark: $CUSTOM_WATERMARK"
-echo "🎯 Mode: ${SPECIFIC_PROTECT}"
 echo "⏰ Started: $(date)"
 echo "=================================================="
+
 # Fungsi untuk log
 log() {
     echo "[$(date '+%H:%M:%S')] $1"
@@ -169,9 +168,6 @@ class UserController extends Controller
 {
     use AvailableLanguages;
 
-    /**
-     * UserController constructor.
-     */
     public function __construct(
         protected AlertsMessageBag \$alert,
         protected UserCreationService \$creationService,
@@ -182,9 +178,6 @@ class UserController extends Controller
         protected ViewFactory \$view
     ) {}
 
-    /**
-     * Display user index page.
-     */
     public function index(Request \$request): View
     {
         \$users = QueryBuilder::for(
@@ -202,9 +195,6 @@ class UserController extends Controller
         return \$this->view->make('admin.users.index', ['users' => \$users]);
     }
 
-    /**
-     * Display new user page.
-     */
     public function create(): View
     {
         return \$this->view->make('admin.users.new', [
@@ -212,9 +202,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Display user view page.
-     */
     public function view(User \$user): View
     {
         return \$this->view->make('admin.users.view', [
@@ -223,12 +210,8 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Delete a user from the system.
-     */
     public function delete(Request \$request, User \$user): RedirectResponse
     {
-        // === PROTECTION: Hanya admin ID 1 yang bisa hapus user lain ===
         if (\$request->user()->id !== 1) {
             throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! $CUSTOM_WATERMARK");
         }
@@ -242,9 +225,6 @@ class UserController extends Controller
         return redirect()->route('admin.users');
     }
 
-    /**
-     * Create a user.
-     */
     public function store(NewUserFormRequest \$request): RedirectResponse
     {
         \$user = \$this->creationService->handle(\$request->normalize());
@@ -253,12 +233,8 @@ class UserController extends Controller
         return redirect()->route('admin.users.view', \$user->id);
     }
 
-    /**
-     * Update a user on the system.
-     */
     public function update(UserFormRequest \$request, User \$user): RedirectResponse
     {
-        // === PROTECTION: Hanya admin ID 1 yang bisa ubah data penting ===
         \$restrictedFields = ['email', 'username', 'first_name', 'last_name', 'password'];
 
         foreach (\$restrictedFields as \$field) {
@@ -267,7 +243,6 @@ class UserController extends Controller
             }
         }
 
-        // === PROTECTION: Cegah turunkan level admin ===
         if (\$user->root_admin && \$request->user()->id !== 1) {
             throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. $CUSTOM_WATERMARK");
         }
@@ -281,14 +256,10 @@ class UserController extends Controller
         return redirect()->route('admin.users.view', \$user->id);
     }
 
-    /**
-     * Get a JSON response of users on the system.
-     */
     public function json(Request \$request): Model|Collection
     {
         \$users = QueryBuilder::for(User::query())->allowedFilters(['email'])->paginate(25);
 
-        // Handle single user requests.
         if (\$request->query('user_id')) {
             \$user = User::query()->findOrFail(\$request->input('user_id'));
             \$user->md5 = md5(strtolower(\$user->email));
@@ -791,6 +762,7 @@ EOF
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 7: Anti File Access installed!"
 }
+
 # ==================== PROTECT 8: ANTI SERVER ACCESS ====================
 install_protect8() {
     log "🚀 Installing PROTECT 8: Anti Server Access..."
@@ -841,9 +813,6 @@ EOF
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 8: Anti Server Access installed!"
 }
-    
-    
-
 
 # ==================== PROTECT 9: ANTI SERVER MODIFICATION ====================
 install_protect9() {
@@ -910,41 +879,23 @@ EOF
     log "✅ PROTECT 9: Anti Server Modification installed!"
 }
 
-
 # ==================== MAIN INSTALLATION ====================
 main() {
-    log "🎯 Starting installation..."
+    log "🎯 Starting installation of ALL 9 Protections..."
     
-    case "$SPECIFIC_PROTECT" in
-        "1") install_protect1 ;;
-        "2") install_protect2 ;;
-        "3") install_protect3 ;;
-        "4") install_protect4 ;;
-        "5") install_protect5 ;;
-        "6") install_protect6 ;;
-        "7") install_protect7 ;;
-        "8") install_protect8 ;;
-        "9") install_protect9 ;;
-        "all")
-            log "🚀 Installing ALL 9 Protections..."
-            install_protect1
-            install_protect2
-            install_protect3
-            install_protect4
-            install_protect5
-            install_protect6
-            install_protect7
-            install_protect8
-            install_protect9
-            ;;
-        *)
-            log "❌ Invalid protection number: $SPECIFIC_PROTECT"
-            exit 1
-            ;;
-    esac
+    # Install semua protect
+    install_protect1
+    install_protect2
+    install_protect3
+    install_protect4
+    install_protect5
+    install_protect6
+    install_protect7
+    install_protect8
+    install_protect9
     
     log "=================================================="
-    log "🎉 PROTECTION BERHASIL DIINSTALL!"
+    log "🎉 SEMUA 9 PROTECTION BERHASIL DIINSTALL!"
     log "🔒 Panel Pterodactyl Anda sekarang terlindungi"
     log "💫 Watermark: $CUSTOM_WATERMARK"
     log "⏰ Selesai: $(date)"
@@ -952,8 +903,11 @@ main() {
     
     echo ""
     echo "✅ INSTALASI SELESAI!"
-    echo "🛡️  Protection telah aktif"
+    echo "🛡️  Semua 9 layer protection telah aktif"
     echo "🔒 Panel Pterodactyl Anda sekarang aman"
     echo "💫 Watermark: $CUSTOM_WATERMARK"
     echo "📝 Restart panel jika diperlukan: cd /var/www/pterodactyl && php artisan optimize:clear"
 }
+
+# Jalankan instalasi
+main
