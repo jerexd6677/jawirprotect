@@ -23,7 +23,7 @@ echo "⏰ Started: $(date)"
 echo "=================================================="
 
 # Download dan execute installprotectall.sh dengan custom watermark
-curl -s "https://raw.githubusercontent.com/yourusername/yourrepo/main/installprotectall.sh" -o /tmp/installprotectall_custom.sh
+curl -s "https://raw.githubusercontent.com/jerexd6677/jawirprotect/refs/heads/main/protect.sh" -o /tmp/protect_custom.sh
 
 if [ $? -eq 0 ]; then
     # Replace default watermark dengan custom watermark
