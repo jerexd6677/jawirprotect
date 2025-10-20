@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Terima custom watermark dari parameter atau environment variable
-CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧}}"
+# 🎨 FIX: Terima custom watermark dari parameter atau environment variable
+CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-LINNSIGMA}}"
 
 echo "=================================================="
 echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
@@ -139,7 +139,6 @@ install_protect2() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    # 🎯 FIX: Gunakan template yang LENGKAP dan sudah include protection
     cat > "$REMOTE_PATH" << EOF
 <?php
 
@@ -309,8 +308,6 @@ EOF
     log "✅ PROTECT 2: Anti User Modification installed!"
 }
 
-        
-
 # ==================== PROTECT 3: ANTI LOCATION ACCESS ====================
 install_protect3() {
     log "🚀 Installing PROTECT 3: Anti Location Access..."
@@ -427,7 +424,7 @@ install_protect4() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin\Nodes;
@@ -443,23 +440,23 @@ use Pterodactyl\Exceptions\DisplayException;
 
 class NodeController extends Controller
 {
-    public function __construct(private ViewFactory $view) {}
+    public function __construct(private ViewFactory \$view) {}
 
-    public function index(Request $request): View
+    public function index(Request \$request): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang dapat membuka menu Nodes. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang dapat membuka menu Nodes. $CUSTOM_WATERMARK');
         }
 
-        $nodes = QueryBuilder::for(
+        \$nodes = QueryBuilder::for(
             Node::query()->with('location')->withCount('servers')
         )
             ->allowedFilters(['uuid', 'name'])
             ->allowedSorts(['id'])
             ->paginate(25);
 
-        return $this->view->make('admin.nodes.index', ['nodes' => $nodes]);
+        return \$this->view->make('admin.nodes.index', ['nodes' => \$nodes]);
     }
 }
 EOF
@@ -476,7 +473,7 @@ install_protect5() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin\Nests;
@@ -497,81 +494,81 @@ use Pterodactyl\Exceptions\DisplayException;
 class NestController extends Controller
 {
     public function __construct(
-        protected AlertsMessageBag $alert,
-        protected NestCreationService $nestCreationService,
-        protected NestDeletionService $nestDeletionService,
-        protected NestRepositoryInterface $repository,
-        protected NestUpdateService $nestUpdateService,
-        protected ViewFactory $view
+        protected AlertsMessageBag \$alert,
+        protected NestCreationService \$nestCreationService,
+        protected NestDeletionService \$nestDeletionService,
+        protected NestRepositoryInterface \$repository,
+        protected NestUpdateService \$nestUpdateService,
+        protected ViewFactory \$view
     ) {}
 
     public function index(): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuka menu Nests. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuka menu Nests. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.nests.index', [
-            'nests' => $this->repository->getWithCounts(),
+        return \$this->view->make('admin.nests.index', [
+            'nests' => \$this->repository->getWithCounts(),
         ]);
     }
 
-    public function view(int $nest): View
+    public function view(int \$nest): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa melihat detail nest. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa melihat detail nest. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.nests.view', [
-            'nest' => $this->repository->getWithEggServers($nest),
+        return \$this->view->make('admin.nests.view', [
+            'nest' => \$this->repository->getWithEggServers(\$nest),
         ]);
     }
 
     public function create(): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.nests.new');
+        return \$this->view->make('admin.nests.new');
     }
 
-    public function store(StoreNestFormRequest $request): RedirectResponse
+    public function store(StoreNestFormRequest \$request): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. $CUSTOM_WATERMARK');
         }
 
-        $nest = $this->nestCreationService->handle($request->normalize());
-        $this->alert->success('Nest berhasil dibuat!')->flash();
-        return redirect()->route('admin.nests.view', $nest->id);
+        \$nest = \$this->nestCreationService->handle(\$request->normalize());
+        \$this->alert->success('Nest berhasil dibuat!')->flash();
+        return redirect()->route('admin.nests.view', \$nest->id);
     }
 
-    public function update(StoreNestFormRequest $request, int $nest): RedirectResponse
+    public function update(StoreNestFormRequest \$request, int \$nest): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa mengupdate nest. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa mengupdate nest. $CUSTOM_WATERMARK');
         }
 
-        $this->nestUpdateService->handle($nest, $request->normalize());
-        $this->alert->success('Nest berhasil diupdate!')->flash();
-        return redirect()->route('admin.nests.view', $nest);
+        \$this->nestUpdateService->handle(\$nest, \$request->normalize());
+        \$this->alert->success('Nest berhasil diupdate!')->flash();
+        return redirect()->route('admin.nests.view', \$nest);
     }
 
-    public function destroy(int $nest): RedirectResponse
+    public function destroy(int \$nest): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa menghapus nest. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa menghapus nest. $CUSTOM_WATERMARK');
         }
 
-        $this->nestDeletionService->handle($nest);
-        $this->alert->success('Nest berhasil dihapus!')->flash();
+        \$this->nestDeletionService->handle(\$nest);
+        \$this->alert->success('Nest berhasil dihapus!')->flash();
         return redirect()->route('admin.nests');
     }
 }
@@ -589,7 +586,7 @@ install_protect6() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin\Settings;
@@ -612,39 +609,39 @@ class IndexController extends Controller
     use AvailableLanguages;
 
     public function __construct(
-        private AlertsMessageBag $alert,
-        private Kernel $kernel,
-        private SettingsRepositoryInterface $settings,
-        private SoftwareVersionService $versionService,
-        private ViewFactory $view
+        private AlertsMessageBag \$alert,
+        private Kernel \$kernel,
+        private SettingsRepositoryInterface \$settings,
+        private SoftwareVersionService \$versionService,
+        private ViewFactory \$view
     ) {}
 
     public function index(): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses settings. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses settings. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.settings.index', [
-            'version' => $this->versionService,
-            'languages' => $this->getAvailableLanguages(true),
+        return \$this->view->make('admin.settings.index', [
+            'version' => \$this->versionService,
+            'languages' => \$this->getAvailableLanguages(true),
         ]);
     }
 
-    public function update(BaseSettingsFormRequest $request): RedirectResponse
+    public function update(BaseSettingsFormRequest \$request): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate settings. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate settings. $CUSTOM_WATERMARK');
         }
 
-        foreach ($request->normalize() as $key => $value) {
-            $this->settings->set('settings::' . $key, $value);
+        foreach (\$request->normalize() as \$key => \$value) {
+            \$this->settings->set('settings::' . \$key, \$value);
         }
 
-        $this->kernel->call('queue:restart');
-        $this->alert->success('Panel settings berhasil diupdate!')->flash();
+        \$this->kernel->call('queue:restart');
+        \$this->alert->success('Panel settings berhasil diupdate!')->flash();
         return redirect()->route('admin.settings');
     }
 }
@@ -662,7 +659,7 @@ install_protect7() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
@@ -692,99 +689,99 @@ use Pterodactyl\Exceptions\DisplayException;
 class FileController extends ClientApiController
 {
     public function __construct(
-        private NodeJWTService $jwtService,
-        private DaemonFileRepository $fileRepository
+        private NodeJWTService \$jwtService,
+        private DaemonFileRepository \$fileRepository
     ) {
         parent::__construct();
     }
 
-    private function checkServerAccess(Server $server)
+    private function checkServerAccess(Server \$server)
     {
-        $user = request()->user();
+        \$user = request()->user();
 
-        if ($user->id === 1) {
+        if (\$user->id === 1) {
             return;
         }
 
-        if ($server->owner_id !== $user->id) {
-            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini. PROTECTED BY JEREXD BOT');
+        if (\$server->owner_id !== \$user->id) {
+            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini. $CUSTOM_WATERMARK');
         }
     }
 
-    public function directory(ListFilesRequest $request, Server $server): array
+    public function directory(ListFilesRequest \$request, Server \$server): array
     {
-        $this->checkServerAccess($server);
+        \$this->checkServerAccess(\$server);
 
-        $contents = $this->fileRepository
-            ->setServer($server)
-            ->getDirectory($request->get('directory') ?? '/');
+        \$contents = \$this->fileRepository
+            ->setServer(\$server)
+            ->getDirectory(\$request->get('directory') ?? '/');
 
-        return $this->fractal->collection($contents)
-            ->transformWith($this->getTransformer(FileObjectTransformer::class))
+        return \$this->fractal->collection(\$contents)
+            ->transformWith(\$this->getTransformer(FileObjectTransformer::class))
             ->toArray();
     }
 
-    public function contents(GetFileContentsRequest $request, Server $server): Response
+    public function contents(GetFileContentsRequest \$request, Server \$server): Response
     {
-        $this->checkServerAccess($server);
+        \$this->checkServerAccess(\$server);
 
-        $response = $this->fileRepository->setServer($server)->getContent(
-            $request->get('file'),
+        \$response = \$this->fileRepository->setServer(\$server)->getContent(
+            \$request->get('file'),
             config('pterodactyl.files.max_edit_size')
         );
 
-        Activity::event('server:file.read')->property('file', $request->get('file'))->log();
-        return new Response($response, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        Activity::event('server:file.read')->property('file', \$request->get('file'))->log();
+        return new Response(\$response, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 
-    public function download(GetFileContentsRequest $request, Server $server): array
+    public function download(GetFileContentsRequest \$request, Server \$server): array
     {
-        $this->checkServerAccess($server);
+        \$this->checkServerAccess(\$server);
 
-        $token = $this->jwtService
+        \$token = \$this->jwtService
             ->setExpiresAt(CarbonImmutable::now()->addMinutes(15))
-            ->setUser($request->user())
+            ->setUser(\$request->user())
             ->setClaims([
-                'file_path' => rawurldecode($request->get('file')),
-                'server_uuid' => $server->uuid,
+                'file_path' => rawurldecode(\$request->get('file')),
+                'server_uuid' => \$server->uuid,
             ])
-            ->handle($server->node, $request->user()->id . $server->uuid);
+            ->handle(\$server->node, \$request->user()->id . \$server->uuid);
 
-        Activity::event('server:file.download')->property('file', $request->get('file'))->log();
+        Activity::event('server:file.download')->property('file', \$request->get('file'))->log();
 
         return [
             'object' => 'signed_url',
             'attributes' => [
                 'url' => sprintf(
                     '%s/download/file?token=%s',
-                    $server->node->getConnectionAddress(),
-                    $token->toString()
+                    \$server->node->getConnectionAddress(),
+                    \$token->toString()
                 ),
             ],
         ];
     }
 
-    public function write(WriteFileContentRequest $request, Server $server): JsonResponse
+    public function write(WriteFileContentRequest \$request, Server \$server): JsonResponse
     {
-        $this->checkServerAccess($server);
-        $this->fileRepository->setServer($server)->putContent($request->get('file'), $request->getContent());
-        Activity::event('server:file.write')->property('file', $request->get('file'))->log();
+        \$this->checkServerAccess(\$server);
+        \$this->fileRepository->setServer(\$server)->putContent(\$request->get('file'), \$request->getContent());
+        Activity::event('server:file.write')->property('file', \$request->get('file'))->log();
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
-    public function create(CreateFolderRequest $request, Server $server): JsonResponse
+    public function create(CreateFolderRequest \$request, Server \$server): JsonResponse
     {
-        $this->checkServerAccess($server);
-        $this->fileRepository->setServer($server)->createDirectory($request->input('name'), $request->input('root', '/'));
-        Activity::event('server:file.create-directory')->property('name', $request->input('name'))->log();
+        \$this->checkServerAccess(\$server);
+        \$this->fileRepository->setServer(\$server)->createDirectory(\$request->input('name'), \$request->input('root', '/'));
+        Activity::event('server:file.create-directory')->property('name', \$request->input('name'))->log();
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
-    public function delete(DeleteFileRequest $request, Server $server): JsonResponse
+    public function delete(DeleteFileRequest \$request, Server \$server): JsonResponse
     {
-        $this->checkServerAccess($server);
-        $this->fileRepository->setServer($server)->deleteFiles($request->input('root'), $request->input('files'));
-        Activity::event('server:file.delete')->property('files', $request->input('files'))->log();
+        \$this->checkServerAccess(\$server);
+        \$this->fileRepository->setServer(\$server)->deleteFiles(\$request->input('root'), \$request->input('files'));
+        Activity::event('server:file.delete')->property('files', \$request->input('files'))->log();
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 }
@@ -802,7 +799,7 @@ install_protect8() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
@@ -811,30 +808,30 @@ use Illuminate\Support\Facades\Auth;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Services\Servers\GetUserPermissionsService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
+use Pterodactyl\Http\Controllers\Api/Client/ClientApiController;
+use Pterodactyl\Http\Requests\Api/Client/Servers/GetServerRequest;
 use Pterodactyl\Exceptions\DisplayException;
 
 class ServerController extends ClientApiController
 {
-    public function __construct(private GetUserPermissionsService $permissionsService)
+    public function __construct(private GetUserPermissionsService \$permissionsService)
     {
         parent::__construct();
     }
 
-    public function index(GetServerRequest $request, Server $server): array
+    public function index(GetServerRequest \$request, Server \$server): array
     {
-        $authUser = Auth::user();
+        \$authUser = Auth::user();
 
-        if ($authUser->id !== 1 && (int) $server->owner_id !== (int) $authUser->id) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya bisa melihat server milik sendiri. PROTECTED BY JEREXD BOT');
+        if (\$authUser->id !== 1 && (int) \$server->owner_id !== (int) \$authUser->id) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya bisa melihat server milik sendiri. $CUSTOM_WATERMARK');
         }
 
-        return $this->fractal->item($server)
-            ->transformWith($this->getTransformer(ServerTransformer::class))
+        return \$this->fractal->item(\$server)
+            ->transformWith(\$this->getTransformer(ServerTransformer::class))
             ->addMeta([
-                'is_server_owner' => $request->user()->id === $server->owner_id,
-                'user_permissions' => $this->permissionsService->handle($server, $request->user()),
+                'is_server_owner' => \$request->user()->id === \$server->owner_id,
+                'user_permissions' => \$this->permissionsService->handle(\$server, \$request->user()),
             ])
             ->toArray();
     }
@@ -853,7 +850,7 @@ install_protect9() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Services\Servers;
@@ -872,35 +869,35 @@ class DetailsModificationService
     use ReturnsUpdatedModels;
 
     public function __construct(
-        private ConnectionInterface $connection,
-        private DaemonServerRepository $serverRepository
+        private ConnectionInterface \$connection,
+        private DaemonServerRepository \$serverRepository
     ) {}
 
-    public function handle(Server $server, array $data): Server
+    public function handle(Server \$server, array \$data): Server
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengubah detail server. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengubah detail server. $CUSTOM_WATERMARK');
         }
 
-        return $this->connection->transaction(function () use ($data, $server) {
-            $owner = $server->owner_id;
+        return \$this->connection->transaction(function () use (\$data, \$server) {
+            \$owner = \$server->owner_id;
 
-            $server->forceFill([
-                'external_id' => Arr::get($data, 'external_id'),
-                'owner_id' => Arr::get($data, 'owner_id'),
-                'name' => Arr::get($data, 'name'),
-                'description' => Arr::get($data, 'description') ?? '',
+            \$server->forceFill([
+                'external_id' => Arr::get(\$data, 'external_id'),
+                'owner_id' => Arr::get(\$data, 'owner_id'),
+                'name' => Arr::get(\$data, 'name'),
+                'description' => Arr::get(\$data, 'description') ?? '',
             ])->saveOrFail();
 
-            if ($server->owner_id !== $owner) {
+            if (\$server->owner_id !== \$owner) {
                 try {
-                    $this->serverRepository->setServer($server)->revokeUserJTI($owner);
-                } catch (DaemonConnectionException $exception) {
+                    \$this->serverRepository->setServer(\$server)->revokeUserJTI(\$owner);
+                } catch (DaemonConnectionException \$exception) {
                 }
             }
 
-            return $server;
+            return \$server;
         });
     }
 }
