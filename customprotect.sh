@@ -22,17 +22,42 @@ echo "💫 Custom Watermark: $CUSTOM_WATERMARK"
 echo "⏰ Started: $(date)"
 echo "=================================================="
 
-# Download dan execute installprotectall.sh dengan custom watermark
+# Download script protect.sh
+echo "📥 Downloading protect.sh from GitHub..."
 curl -s "https://raw.githubusercontent.com/jerexd6677/jawirprotect/refs/heads/main/protect.sh" -o /tmp/protect_custom.sh
 
+if [ $? -ne 0 ]; then
+    echo "❌ Gagal download protect.sh"
+    exit 1
+fi
+
+# Cek apakah file berhasil didownload
+if [ ! -f "/tmp/protect_custom.sh" ]; then
+    echo "❌ File protect.sh tidak ditemukan setelah download"
+    exit 1
+fi
+
+# Replace default watermark dengan custom watermark
+echo "🔧 Applying custom watermark: $CUSTOM_WATERMARK"
+sed -i "s/PROTECTED BY JEREXD BOT/$CUSTOM_WATERMARK/g" /tmp/protect_custom.sh
+sed -i "s/𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧/$CUSTOM_WATERMARK/g" /tmp/protect_custom.sh
+
+# Tambahkan parameter custom watermark ke script
+echo "CUSTOM_WATERMARK=\"$CUSTOM_WATERMARK\"" >> /tmp/protect_custom.sh
+
+# Make executable dan execute
+chmod +x /tmp/protect_custom.sh
+echo "🚀 Executing custom protect script..."
+bash /tmp/protect_custom.sh
+
+# Cek hasil execution
 if [ $? -eq 0 ]; then
-    # Replace default watermark dengan custom watermark
-    sed -i "s/PROTECTED BY JEREXD BOT/$CUSTOM_WATERMARK/g" /tmp/installprotectall_custom.sh
-    sed -i "s/𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧/$CUSTOM_WATERMARK/g" /tmp/installprotectall_custom.sh
-    
-    # Execute script
-    bash /tmp/installprotectall_custom.sh "$CUSTOM_WATERMARK"
+    echo "=================================================="
+    echo "✅ CUSTOM PROTECT ALL BERHASIL DIINSTALL!"
+    echo "💫 Watermark: $CUSTOM_WATERMARK"
+    echo "🔒 Semua 9 protection aktif dengan custom text"
+    echo "=================================================="
 else
-    echo "❌ Gagal download installprotectall.sh"
+    echo "❌ Gagal execute custom protect script"
     exit 1
 fi
