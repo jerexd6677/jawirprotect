@@ -790,7 +790,6 @@ EOF
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 7: Anti File Access installed!"
 }
-
 # ==================== PROTECT 8: ANTI SERVER ACCESS ====================
 install_protect8() {
     log "🚀 Installing PROTECT 8: Anti Server Access..."
@@ -808,8 +807,8 @@ use Illuminate\Support\Facades\Auth;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Services\Servers\GetUserPermissionsService;
-use Pterodactyl\Http\Controllers\Api/Client/ClientApiController;
-use Pterodactyl\Http\Requests\Api/Client/Servers/GetServerRequest;
+use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
 use Pterodactyl\Exceptions\DisplayException;
 
 class ServerController extends ClientApiController
@@ -841,6 +840,9 @@ EOF
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 8: Anti Server Access installed!"
 }
+    
+    
+
 
 # ==================== PROTECT 9: ANTI SERVER MODIFICATION ====================
 install_protect9() {
