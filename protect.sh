@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# 🎨 FIX: Default watermark kosong, wajib dari parameter
-CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK}}"
-
-if [ -z "$CUSTOM_WATERMARK" ]; then
-    echo "❌ ERROR: Custom watermark required!"
-    echo "Usage: $0 \"WATERMARK_TEXT\""
-    exit 1
-fi
+# 🎨 FIX: Terima custom watermark dari parameter
+CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-PROTECT BY LINNSIGMA}}"
+SPECIFIC_PROTECT="${2:-all}"
 
 echo "=================================================="
-echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
+echo "🛡️  JEREPROTECTBOT - INSTALL PROTECTION"
 echo "🔒 Version: 2.0 Premium"
 echo "💫 Watermark: $CUSTOM_WATERMARK"
+echo "🎯 Mode: ${SPECIFIC_PROTECT}"
 echo "⏰ Started: $(date)"
 echo "=================================================="
 # Fungsi untuk log
@@ -914,23 +910,41 @@ EOF
     log "✅ PROTECT 9: Anti Server Modification installed!"
 }
 
+
 # ==================== MAIN INSTALLATION ====================
 main() {
-    log "🎯 Starting installation of ALL 9 Protections..."
+    log "🎯 Starting installation..."
     
-    # Install semua protect
-    install_protect1
-    install_protect2
-    install_protect3
-    install_protect4
-    install_protect5
-    install_protect6
-    install_protect7
-    install_protect8
-    install_protect9
+    case "$SPECIFIC_PROTECT" in
+        "1") install_protect1 ;;
+        "2") install_protect2 ;;
+        "3") install_protect3 ;;
+        "4") install_protect4 ;;
+        "5") install_protect5 ;;
+        "6") install_protect6 ;;
+        "7") install_protect7 ;;
+        "8") install_protect8 ;;
+        "9") install_protect9 ;;
+        "all")
+            log "🚀 Installing ALL 9 Protections..."
+            install_protect1
+            install_protect2
+            install_protect3
+            install_protect4
+            install_protect5
+            install_protect6
+            install_protect7
+            install_protect8
+            install_protect9
+            ;;
+        *)
+            log "❌ Invalid protection number: $SPECIFIC_PROTECT"
+            exit 1
+            ;;
+    esac
     
     log "=================================================="
-    log "🎉 SEMUA 9 PROTECTION BERHASIL DIINSTALL!"
+    log "🎉 PROTECTION BERHASIL DIINSTALL!"
     log "🔒 Panel Pterodactyl Anda sekarang terlindungi"
     log "💫 Watermark: $CUSTOM_WATERMARK"
     log "⏰ Selesai: $(date)"
@@ -938,11 +952,8 @@ main() {
     
     echo ""
     echo "✅ INSTALASI SELESAI!"
-    echo "🛡️  Semua 9 layer protection telah aktif"
+    echo "🛡️  Protection telah aktif"
     echo "🔒 Panel Pterodactyl Anda sekarang aman"
-    echo "💫 Custom Watermark: $CUSTOM_WATERMARK"
+    echo "💫 Watermark: $CUSTOM_WATERMARK"
     echo "📝 Restart panel jika diperlukan: cd /var/www/pterodactyl && php artisan optimize:clear"
 }
-
-# Jalankan instalasi
-main
