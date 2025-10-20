@@ -34,13 +34,28 @@ fi
 # 🎨 FIX: Replace watermark di script
 echo "🔧 Applying custom watermark: $CUSTOM_WATERMARK"
 
-# Replace default watermark
+# Replace default watermark di variable
 sed -i "s|CUSTOM_WATERMARK:-\".*\"|CUSTOM_WATERMARK:-\"$CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
 
-# Execute script dengan custom watermark
+# Replace watermark di header output
+sed -i "s|echo \"💫 Watermark:.*|echo \"💫 Watermark: $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+
+# Replace watermark di log output
+sed -i "s|log \"💫 Watermark:.*|log \"💫 Watermark: $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+
+# Replace watermark di final output
+sed -i "s|echo \"💫 Watermark:.*|echo \"💫 Watermark: $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+
+# Replace watermark di semua echo output
+sed -i "s|echo \"🔒 .*\"|echo \"🔒 $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+
+# Replace hardcoded watermark di semua protection
+sed -i "s|PROTECT BY LINNSIGMA|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
+
+# Execute script yang sudah dimodifikasi
 chmod +x /tmp/protect_custom.sh
 echo "🚀 Executing custom protect script..."
-bash /tmp/protect_custom.sh "$CUSTOM_WATERMARK" "all"
+bash /tmp/protect_custom.sh "$CUSTOM_WATERMARK"
 
 if [ $? -eq 0 ]; then
     echo "=================================================="
