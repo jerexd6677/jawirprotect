@@ -1,14 +1,7 @@
 #!/bin/bash
 
-# ==================================================
-# INSTALL PROTECT ALL 1-9 + CUSTOM VERSION
-# Author: JereProtectBot
-# Version: 2.0 Premium
-# ==================================================
-
-# Default watermark
-DEFAULT_WATERMARK="𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧"
-CUSTOM_WATERMARK="${1:-$DEFAULT_WATERMARK}"
+# Terima custom watermark dari parameter atau environment variable
+CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧}}"
 
 echo "=================================================="
 echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
@@ -55,7 +48,7 @@ install_protect1() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Services\Servers;
@@ -72,63 +65,63 @@ use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class ServerDeletionService
 {
-    protected bool $force = false;
+    protected bool \$force = false;
 
     public function __construct(
-        private ConnectionInterface $connection,
-        private DaemonServerRepository $daemonServerRepository,
-        private DatabaseManagementService $databaseManagementService
+        private ConnectionInterface \$connection,
+        private DaemonServerRepository \$daemonServerRepository,
+        private DatabaseManagementService \$databaseManagementService
     ) {}
 
-    public function withForce(bool $bool = true): self
+    public function withForce(bool \$bool = true): self
     {
-        $this->force = $bool;
-        return $this;
+        \$this->force = \$bool;
+        return \$this;
     }
 
-    public function handle(Server $server): void
+    public function handle(Server \$server): void
     {
-        $user = Auth::user();
+        \$user = Auth::user();
 
-        if ($user) {
-            if ($user->id !== 1) {
-                $ownerId = $server->owner_id
-                    ?? $server->user_id
-                    ?? ($server->owner?->id ?? null)
-                    ?? ($server->user?->id ?? null);
+        if (\$user) {
+            if (\$user->id !== 1) {
+                \$ownerId = \$server->owner_id
+                    ?? \$server->user_id
+                    ?? (\$server->owner?->id ?? null)
+                    ?? (\$server->user?->id ?? null);
 
-                if ($ownerId === null) {
-                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia. PROTECTED BY JEREXD BOT');
+                if (\$ownerId === null) {
+                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia. $CUSTOM_WATERMARK');
                 }
 
-                if ($ownerId !== $user->id) {
-                    throw new DisplayException('Akses ditolak: Anda hanya dapat menghapus server milik Anda sendiri. PROTECTED BY JEREXD BOT');
+                if (\$ownerId !== \$user->id) {
+                    throw new DisplayException('Akses ditolak: Anda hanya dapat menghapus server milik Anda sendiri. $CUSTOM_WATERMARK');
                 }
             }
         }
 
         try {
-            $this->daemonServerRepository->setServer($server)->delete();
-        } catch (DaemonConnectionException $exception) {
-            if (!$this->force && $exception->getStatusCode() !== Response::HTTP_NOT_FOUND) {
-                throw $exception;
+            \$this->daemonServerRepository->setServer(\$server)->delete();
+        } catch (DaemonConnectionException \$exception) {
+            if (!\$this->force && \$exception->getStatusCode() !== Response::HTTP_NOT_FOUND) {
+                throw \$exception;
             }
-            Log::warning($exception);
+            Log::warning(\$exception);
         }
 
-        $this->connection->transaction(function () use ($server) {
-            foreach ($server->databases as $database) {
+        \$this->connection->transaction(function () use (\$server) {
+            foreach (\$server->databases as \$database) {
                 try {
-                    $this->databaseManagementService->delete($database);
-                } catch (\Exception $exception) {
-                    if (!$this->force) {
-                        throw $exception;
+                    \$this->databaseManagementService->delete(\$database);
+                } catch (\\Exception \$exception) {
+                    if (!\$this->force) {
+                        throw \$exception;
                     }
-                    $database->delete();
-                    Log::warning($exception);
+                    \$database->delete();
+                    Log::warning(\$exception);
                 }
             }
-            $server->delete();
+            \$server->delete();
         });
     }
 }
@@ -146,7 +139,7 @@ install_protect2() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin;
@@ -168,47 +161,47 @@ use Pterodactyl\Http\Requests\Admin\NewUserFormRequest;
 class UserController extends Controller
 {
     public function __construct(
-        protected AlertsMessageBag $alert,
-        protected UserCreationService $creationService,
-        protected UserDeletionService $deletionService,
-        protected UserUpdateService $updateService
+        protected AlertsMessageBag \$alert,
+        protected UserCreationService \$creationService,
+        protected UserDeletionService \$deletionService,
+        protected UserUpdateService \$updateService
     ) {}
 
-    public function delete(Request $request, User $user): RedirectResponse
+    public function delete(Request \$request, User \$user): RedirectResponse
     {
         if (Auth::user()->id !== 1) {
-            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! PROTECTED BY JEREXD BOT");
+            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! $CUSTOM_WATERMARK");
         }
 
-        if ($request->user()->id === $user->id) {
+        if (\$request->user()->id === \$user->id) {
             throw new DisplayException('Tidak bisa menghapus akun sendiri!');
         }
 
-        $this->deletionService->handle($user);
+        \$this->deletionService->handle(\$user);
         return redirect()->route('admin.users');
     }
 
-    public function update(UserFormRequest $request, User $user): RedirectResponse
+    public function update(UserFormRequest \$request, User \$user): RedirectResponse
     {
-        $restrictedFields = ['email', 'username', 'password'];
+        \$restrictedFields = ['email', 'username', 'password'];
 
-        foreach ($restrictedFields as $field) {
-            if ($request->filled($field) && Auth::user()->id !== 1) {
-                throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1. PROTECTED BY JEREXD BOT");
+        foreach (\$restrictedFields as \$field) {
+            if (\$request->filled(\$field) && Auth::user()->id !== 1) {
+                throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1. $CUSTOM_WATERMARK");
             }
         }
 
-        if ($user->root_admin && Auth::user()->id !== 1) {
-            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. PROTECTED BY JEREXD BOT");
+        if (\$user->root_admin && Auth::user()->id !== 1) {
+            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. $CUSTOM_WATERMARK");
         }
 
-        $this->updateService->handle($user, $request->normalize());
-        $this->alert->success('User berhasil diupdate!')->flash();
+        \$this->updateService->handle(\$user, \$request->normalize());
+        \$this->alert->success('User berhasil diupdate!')->flash();
 
-        return redirect()->route('admin.users.view', $user->id);
+        return redirect()->route('admin.users.view', \$user->id);
     }
 
-    public function index(Request $request): View
+    public function index(Request \$request): View
     {
         return view('admin.users.index');
     }
@@ -218,16 +211,16 @@ class UserController extends Controller
         return view('admin.users.new');
     }
 
-    public function view(User $user): View
+    public function view(User \$user): View
     {
-        return view('admin.users.view', ['user' => $user]);
+        return view('admin.users.view', ['user' => \$user]);
     }
 
-    public function store(NewUserFormRequest $request): RedirectResponse
+    public function store(NewUserFormRequest \$request): RedirectResponse
     {
-        $user = $this->creationService->handle($request->normalize());
-        $this->alert->success('User berhasil dibuat!')->flash();
-        return redirect()->route('admin.users.view', $user->id);
+        \$user = \$this->creationService->handle(\$request->normalize());
+        \$this->alert->success('User berhasil dibuat!')->flash();
+        return redirect()->route('admin.users.view', \$user->id);
     }
 }
 EOF
@@ -244,7 +237,7 @@ install_protect3() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << 'EOF'
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin;
@@ -266,75 +259,75 @@ use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 class LocationController extends Controller
 {
     public function __construct(
-        protected AlertsMessageBag $alert,
-        protected LocationCreationService $creationService,
-        protected LocationDeletionService $deletionService,
-        protected LocationRepositoryInterface $repository,
-        protected LocationUpdateService $updateService,
-        protected ViewFactory $view
+        protected AlertsMessageBag \$alert,
+        protected LocationCreationService \$creationService,
+        protected LocationDeletionService \$deletionService,
+        protected LocationRepositoryInterface \$repository,
+        protected LocationUpdateService \$updateService,
+        protected ViewFactory \$view
     ) {}
 
     public function index(): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses locations. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses locations. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.locations.index', [
-            'locations' => $this->repository->getAllWithDetails(),
+        return \$this->view->make('admin.locations.index', [
+            'locations' => \$this->repository->getAllWithDetails(),
         ]);
     }
 
-    public function view(int $id): View
+    public function view(int \$id): View
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa melihat detail location. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa melihat detail location. $CUSTOM_WATERMARK');
         }
 
-        return $this->view->make('admin.locations.view', [
-            'location' => $this->repository->getWithNodes($id),
+        return \$this->view->make('admin.locations.view', [
+            'location' => \$this->repository->getWithNodes(\$id),
         ]);
     }
 
-    public function create(LocationFormRequest $request): RedirectResponse
+    public function create(LocationFormRequest \$request): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa membuat location. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa membuat location. $CUSTOM_WATERMARK');
         }
 
-        $location = $this->creationService->handle($request->normalize());
-        $this->alert->success('Location berhasil dibuat!')->flash();
-        return redirect()->route('admin.locations.view', $location->id);
+        \$location = \$this->creationService->handle(\$request->normalize());
+        \$this->alert->success('Location berhasil dibuat!')->flash();
+        return redirect()->route('admin.locations.view', \$location->id);
     }
 
-    public function update(LocationFormRequest $request, Location $location): RedirectResponse
+    public function update(LocationFormRequest \$request, Location \$location): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate location. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate location. $CUSTOM_WATERMARK');
         }
 
-        if ($request->input('action') === 'delete') {
-            return $this->delete($location);
+        if (\$request->input('action') === 'delete') {
+            return \$this->delete(\$location);
         }
 
-        $this->updateService->handle($location->id, $request->normalize());
-        $this->alert->success('Location berhasil diupdate!')->flash();
-        return redirect()->route('admin.locations.view', $location->id);
+        \$this->updateService->handle(\$location->id, \$request->normalize());
+        \$this->alert->success('Location berhasil diupdate!')->flash();
+        return redirect()->route('admin.locations.view', \$location->id);
     }
 
-    public function delete(Location $location): RedirectResponse
+    public function delete(Location \$location): RedirectResponse
     {
-        $user = Auth::user();
-        if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa menghapus location. PROTECTED BY JEREXD BOT');
+        \$user = Auth::user();
+        if (!\$user || \$user->id !== 1) {
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa menghapus location. $CUSTOM_WATERMARK');
         }
 
-        $this->deletionService->handle($location->id);
-        $this->alert->success('Location berhasil dihapus!')->flash();
+        \$this->deletionService->handle(\$location->id);
+        \$this->alert->success('Location berhasil dihapus!')->flash();
         return redirect()->route('admin.locations');
     }
 }
@@ -861,6 +854,7 @@ main() {
     echo "✅ INSTALASI SELESAI!"
     echo "🛡️  Semua 9 layer protection telah aktif"
     echo "🔒 Panel Pterodactyl Anda sekarang aman"
+    echo "💫 Custom Watermark: $CUSTOM_WATERMARK"
     echo "📝 Restart panel jika diperlukan: cd /var/www/pterodactyl && php artisan optimize:clear"
 }
 
