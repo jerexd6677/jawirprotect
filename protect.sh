@@ -131,6 +131,7 @@ EOF
     log "✅ PROTECT 1: Anti Delete Server installed!"
 }
 
+
 # ==================== PROTECT 2: ANTI USER MODIFICATION ====================
 install_protect2() {
     log "🚀 Installing PROTECT 2: Anti User Modification..."
@@ -139,7 +140,13 @@ install_protect2() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    cat > "$REMOTE_PATH" << EOF
+    # Download file original dulu
+    curl -s "https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/UserController.php" -o "$REMOTE_PATH"
+    
+    if [ $? -ne 0 ]; then
+        log "⚠️ Gagal download original file, menggunakan template custom..."
+        # Fallback ke template sederhana
+        cat > "$REMOTE_PATH" << 'ENDOFFILE'
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin;
@@ -161,47 +168,47 @@ use Pterodactyl\Http\Requests\Admin\NewUserFormRequest;
 class UserController extends Controller
 {
     public function __construct(
-        protected AlertsMessageBag \$alert,
-        protected UserCreationService \$creationService,
-        protected UserDeletionService \$deletionService,
-        protected UserUpdateService \$updateService
+        protected AlertsMessageBag $alert,
+        protected UserCreationService $creationService,
+        protected UserDeletionService $deletionService,
+        protected UserUpdateService $updateService
     ) {}
 
-    public function delete(Request \$request, User \$user): RedirectResponse
+    public function delete(Request $request, User $user): RedirectResponse
     {
         if (Auth::user()->id !== 1) {
-            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! $CUSTOM_WATERMARK");
+            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain!");
         }
 
-        if (\$request->user()->id === \$user->id) {
+        if ($request->user()->id === $user->id) {
             throw new DisplayException('Tidak bisa menghapus akun sendiri!');
         }
 
-        \$this->deletionService->handle(\$user);
+        $this->deletionService->handle($user);
         return redirect()->route('admin.users');
     }
 
-    public function update(UserFormRequest \$request, User \$user): RedirectResponse
+    public function update(UserFormRequest $request, User $user): RedirectResponse
     {
-        \$restrictedFields = ['email', 'username', 'password'];
+        $restrictedFields = ['email', 'username', 'password'];
 
-        foreach (\$restrictedFields as \$field) {
-            if (\$request->filled(\$field) && Auth::user()->id !== 1) {
-                throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1. $CUSTOM_WATERMARK");
+        foreach ($restrictedFields as $field) {
+            if ($request->filled($field) && Auth::user()->id !== 1) {
+                throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1.");
             }
         }
 
-        if (\$user->root_admin && Auth::user()->id !== 1) {
-            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. $CUSTOM_WATERMARK");
+        if ($user->root_admin && Auth::user()->id !== 1) {
+            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini.");
         }
 
-        \$this->updateService->handle(\$user, \$request->normalize());
-        \$this->alert->success('User berhasil diupdate!')->flash();
+        $this->updateService->handle($user, $request->normalize());
+        $this->alert->success('User berhasil diupdate!')->flash();
 
-        return redirect()->route('admin.users.view', \$user->id);
+        return redirect()->route('admin.users.view', $user->id);
     }
 
-    public function index(Request \$request): View
+    public function index(Request $request): View
     {
         return view('admin.users.index');
     }
@@ -211,19 +218,25 @@ class UserController extends Controller
         return view('admin.users.new');
     }
 
-    public function view(User \$user): View
+    public function view(User $user): View
     {
-        return view('admin.users.view', ['user' => \$user]);
+        return view('admin.users.view', ['user' => $user]);
     }
 
-    public function store(NewUserFormRequest \$request): RedirectResponse
+    public function store(NewUserFormRequest $request): RedirectResponse
     {
-        \$user = \$this->creationService->handle(\$request->normalize());
-        \$this->alert->success('User berhasil dibuat!')->flash();
-        return redirect()->route('admin.users.view', \$user->id);
+        $user = $this->creationService->handle($request->normalize());
+        $this->alert->success('User berhasil dibuat!')->flash();
+        return redirect()->route('admin.users.view', $user->id);
     }
 }
-EOF
+ENDOFFILE
+    fi
+
+    # Tambahkan custom watermark dengan SED
+    sed -i 's/throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain!");/throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
+    sed -i 's/throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1.");/throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1. '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
+    sed -i 's/throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini.");/throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
 
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 2: Anti User Modification installed!"
