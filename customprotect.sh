@@ -9,7 +9,7 @@
 # Cek parameter
 if [ $# -eq 0 ]; then
     echo "❌ Usage: $0 \"CUSTOM_WATERMARK_TEXT\""
-    echo "💫 Example: $0 \"LINNSIGMA\""
+    echo "💫 Example: $0 \"PROTECT BY LINNSIGMA\""
     exit 1
 fi
 
@@ -34,23 +34,34 @@ fi
 # 🎨 FIX: Replace SEMUA watermark dengan custom
 echo "🔧 Applying custom watermark: $CUSTOM_WATERMARK"
 
-# Replace watermark di header
+# 1. Replace DEFAULT watermark variable di awal script
+sed -i "s|CUSTOM_WATERMARK:-\".*\"|CUSTOM_WATERMARK:-\"$CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+sed -i "s|CUSTOM_WATERMARK:-\".*\"|CUSTOM_WATERMARK:-\"$CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+
+# 2. Replace watermark di header output
 sed -i "s|💫 Watermark:.*|💫 Watermark: $CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
 
-# Replace watermark di variable default
-sed -i "s|CUSTOM_WATERMARK:-\"𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧\"|CUSTOM_WATERMARK:-\"$CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
-sed -i "s|CUSTOM_WATERMARK:-𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧|CUSTOM_WATERMARK:-\"$CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+# 3. Replace watermark di main function output
+sed -i "s|log \"💫 Watermark:.*|log \"💫 Watermark: $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+sed -i "s|echo \"💫 Custom Watermark:.*|echo \"💫 Custom Watermark: $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
 
-# Replace watermark di dalam string PHP
-sed -i "s|\\$CUSTOM_WATERMARK|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
+# 4. Replace watermark di semua echo output
+sed -i "s|echo \"🔒 .*\"|echo \"🔒 $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
+sed -i "s|echo \"💫 .*\"|echo \"💫 $CUSTOM_WATERMARK\"|g" /tmp/protect_custom.sh
 
-# Replace hardcoded watermark di semua protection
+# 5. Replace hardcoded watermark di semua protection
 sed -i "s|PROTECTED BY JEREXD BOT|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
 sed -i "s|𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
 
-# Replace di output messages
-sed -i "s|🔒 𝗣𝗥𝗢𝗧𝗘𝗖𝗧𝗘𝗗 𝗕𝗬 𝗝𝗘𝗥𝗘𝗫𝗗 𝗕𝗢𝗧|🔒 $CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
-sed -i "s|💫 Custom Watermark:.*|💫 Custom Watermark: $CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
+# 6. Replace watermark variable di PHP files
+sed -i "s|\\$CUSTOM_WATERMARK|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
+
+# 7. Replace watermark sebelumnya yang mungkin stuck
+sed -i "s|LINNSIGMA|$CUSTOM_WATERMARK|g" /tmp/protect_custom.sh
+
+# Debug: Tampilkan perubahan
+echo "🔍 Debug - Watermark replacements applied"
+grep -n "Watermark:" /tmp/protect_custom.sh | head -5
 
 # Export variable untuk memastikan
 export CUSTOM_WATERMARK="$CUSTOM_WATERMARK"
