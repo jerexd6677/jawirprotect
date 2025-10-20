@@ -131,7 +131,6 @@ EOF
     log "✅ PROTECT 1: Anti Delete Server installed!"
 }
 
-
 # ==================== PROTECT 2: ANTI USER MODIFICATION ====================
 install_protect2() {
     log "🚀 Installing PROTECT 2: Anti User Modification..."
@@ -140,13 +139,8 @@ install_protect2() {
     ensure_directory "$REMOTE_PATH"
     backup_file "$REMOTE_PATH"
     
-    # Download file original dulu
-    curl -s "https://raw.githubusercontent.com/pterodactyl/panel/develop/app/Http/Controllers/Admin/UserController.php" -o "$REMOTE_PATH"
-    
-    if [ $? -ne 0 ]; then
-        log "⚠️ Gagal download original file, menggunakan template custom..."
-        # Fallback ke template sederhana
-        cat > "$REMOTE_PATH" << 'ENDOFFILE'
+    # 🎯 FIX: Gunakan template yang LENGKAP dan sudah include protection
+    cat > "$REMOTE_PATH" << EOF
 <?php
 
 namespace Pterodactyl\Http\Controllers\Admin;
@@ -154,93 +148,168 @@ namespace Pterodactyl\Http\Controllers\Admin;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
+use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Translation\Translator;
 use Pterodactyl\Services\Users\UserUpdateService;
+use Pterodactyl\Traits\Helpers\AvailableLanguages;
 use Pterodactyl\Services\Users\UserCreationService;
 use Pterodactyl\Services\Users\UserDeletionService;
 use Pterodactyl\Http\Requests\Admin\UserFormRequest;
 use Pterodactyl\Http\Requests\Admin\NewUserFormRequest;
+use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 
 class UserController extends Controller
 {
+    use AvailableLanguages;
+
+    /**
+     * UserController constructor.
+     */
     public function __construct(
-        protected AlertsMessageBag $alert,
-        protected UserCreationService $creationService,
-        protected UserDeletionService $deletionService,
-        protected UserUpdateService $updateService
+        protected AlertsMessageBag \$alert,
+        protected UserCreationService \$creationService,
+        protected UserDeletionService \$deletionService,
+        protected Translator \$translator,
+        protected UserUpdateService \$updateService,
+        protected UserRepositoryInterface \$repository,
+        protected ViewFactory \$view
     ) {}
 
-    public function delete(Request $request, User $user): RedirectResponse
+    /**
+     * Display user index page.
+     */
+    public function index(Request \$request): View
     {
-        if (Auth::user()->id !== 1) {
-            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain!");
+        \$users = QueryBuilder::for(
+            User::query()->select('users.*')
+                ->selectRaw('COUNT(DISTINCT(subusers.id)) as subuser_of_count')
+                ->selectRaw('COUNT(DISTINCT(servers.id)) as servers_count')
+                ->leftJoin('subusers', 'subusers.user_id', '=', 'users.id')
+                ->leftJoin('servers', 'servers.owner_id', '=', 'users.id')
+                ->groupBy('users.id')
+        )
+            ->allowedFilters(['username', 'email', 'uuid'])
+            ->allowedSorts(['id', 'uuid'])
+            ->paginate(50);
+
+        return \$this->view->make('admin.users.index', ['users' => \$users]);
+    }
+
+    /**
+     * Display new user page.
+     */
+    public function create(): View
+    {
+        return \$this->view->make('admin.users.new', [
+            'languages' => \$this->getAvailableLanguages(true),
+        ]);
+    }
+
+    /**
+     * Display user view page.
+     */
+    public function view(User \$user): View
+    {
+        return \$this->view->make('admin.users.view', [
+            'user' => \$user,
+            'languages' => \$this->getAvailableLanguages(true),
+        ]);
+    }
+
+    /**
+     * Delete a user from the system.
+     */
+    public function delete(Request \$request, User \$user): RedirectResponse
+    {
+        // === PROTECTION: Hanya admin ID 1 yang bisa hapus user lain ===
+        if (\$request->user()->id !== 1) {
+            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! $CUSTOM_WATERMARK");
         }
 
-        if ($request->user()->id === $user->id) {
-            throw new DisplayException('Tidak bisa menghapus akun sendiri!');
+        if (\$request->user()->id === \$user->id) {
+            throw new DisplayException(\$this->translator->get('admin/user.exceptions.user_has_servers'));
         }
 
-        $this->deletionService->handle($user);
+        \$this->deletionService->handle(\$user);
+
         return redirect()->route('admin.users');
     }
 
-    public function update(UserFormRequest $request, User $user): RedirectResponse
+    /**
+     * Create a user.
+     */
+    public function store(NewUserFormRequest \$request): RedirectResponse
     {
-        $restrictedFields = ['email', 'username', 'password'];
+        \$user = \$this->creationService->handle(\$request->normalize());
+        \$this->alert->success(\$this->translator->get('admin/user.notices.account_created'))->flash();
 
-        foreach ($restrictedFields as $field) {
-            if ($request->filled($field) && Auth::user()->id !== 1) {
-                throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1.");
+        return redirect()->route('admin.users.view', \$user->id);
+    }
+
+    /**
+     * Update a user on the system.
+     */
+    public function update(UserFormRequest \$request, User \$user): RedirectResponse
+    {
+        // === PROTECTION: Hanya admin ID 1 yang bisa ubah data penting ===
+        \$restrictedFields = ['email', 'username', 'first_name', 'last_name', 'password'];
+
+        foreach (\$restrictedFields as \$field) {
+            if (\$request->filled(\$field) && \$request->user()->id !== 1) {
+                throw new DisplayException("⚠️ Data sensitif hanya bisa diubah oleh admin ID 1. $CUSTOM_WATERMARK");
             }
         }
 
-        if ($user->root_admin && Auth::user()->id !== 1) {
-            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini.");
+        // === PROTECTION: Cegah turunkan level admin ===
+        if (\$user->root_admin && \$request->user()->id !== 1) {
+            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. $CUSTOM_WATERMARK");
         }
 
-        $this->updateService->handle($user, $request->normalize());
-        $this->alert->success('User berhasil diupdate!')->flash();
+        \$this->updateService
+            ->setUserLevel(User::USER_LEVEL_ADMIN)
+            ->handle(\$user, \$request->normalize());
 
-        return redirect()->route('admin.users.view', $user->id);
+        \$this->alert->success(\$this->translator->get('admin/user.notices.account_updated'))->flash();
+
+        return redirect()->route('admin.users.view', \$user->id);
     }
 
-    public function index(Request $request): View
+    /**
+     * Get a JSON response of users on the system.
+     */
+    public function json(Request \$request): Model|Collection
     {
-        return view('admin.users.index');
-    }
+        \$users = QueryBuilder::for(User::query())->allowedFilters(['email'])->paginate(25);
 
-    public function create(): View
-    {
-        return view('admin.users.new');
-    }
+        // Handle single user requests.
+        if (\$request->query('user_id')) {
+            \$user = User::query()->findOrFail(\$request->input('user_id'));
+            \$user->md5 = md5(strtolower(\$user->email));
 
-    public function view(User $user): View
-    {
-        return view('admin.users.view', ['user' => $user]);
-    }
+            return \$user;
+        }
 
-    public function store(NewUserFormRequest $request): RedirectResponse
-    {
-        $user = $this->creationService->handle($request->normalize());
-        $this->alert->success('User berhasil dibuat!')->flash();
-        return redirect()->route('admin.users.view', $user->id);
+        return \$users->map(function (\$item) {
+            \$item->md5 = md5(strtolower(\$item->email));
+
+            return \$item;
+        });
     }
 }
-ENDOFFILE
-    fi
-
-    # Tambahkan custom watermark dengan SED
-    sed -i 's/throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain!");/throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
-    sed -i 's/throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1.");/throw new DisplayException("⚠️ Data hanya bisa diubah oleh admin ID 1. '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
-    sed -i 's/throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini.");/throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. '"$CUSTOM_WATERMARK"'");/g' "$REMOTE_PATH"
+EOF
 
     chmod 644 "$REMOTE_PATH"
     log "✅ PROTECT 2: Anti User Modification installed!"
 }
+
+        
 
 # ==================== PROTECT 3: ANTI LOCATION ACCESS ====================
 install_protect3() {
