@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# 🎨 FIX: Terima custom watermark dari parameter atau environment variable
-CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK:-LINNSIGMA}}"
+# 🎨 FIX: Default watermark kosong, wajib dari parameter
+CUSTOM_WATERMARK="${1:-${CUSTOM_WATERMARK}}"
+
+if [ -z "$CUSTOM_WATERMARK" ]; then
+    echo "❌ ERROR: Custom watermark required!"
+    echo "Usage: $0 \"WATERMARK_TEXT\""
+    exit 1
+fi
 
 echo "=================================================="
 echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
@@ -9,7 +15,6 @@ echo "🔒 Version: 2.0 Premium"
 echo "💫 Watermark: $CUSTOM_WATERMARK"
 echo "⏰ Started: $(date)"
 echo "=================================================="
-
 # Fungsi untuk log
 log() {
     echo "[$(date '+%H:%M:%S')] $1"
