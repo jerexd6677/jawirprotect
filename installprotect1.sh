@@ -59,7 +59,7 @@ class ServerDeletionService
                     ?? ($server->user?->id ?? null);
 
                 if ($ownerId === null) {
-                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia. PROTECT BY LINNSIGMA');
+                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia. PROTECT BY JEREXD');
                 }
 
                 if ($ownerId !== $user->id) {
