@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 7: Anti File Access..."
-echo "🔒 PROTECT BY LINNSIGMA"
+echo "🔒 PROTECT BY JEREXD"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Api/Client/Servers/FileController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -15,7 +15,7 @@ fi
 # Create directory jika tidak ada
 mkdir -p "$(dirname "$REMOTE_PATH")"
 
-# Install Protect 7
+# Install Protect 7 - VERSI DIPERBAIKI
 cat > "$REMOTE_PATH" << 'EOF'
 <?php
 
@@ -61,7 +61,7 @@ class FileController extends ClientApiController
         }
 
         if ($server->owner_id !== $user->id) {
-            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini. PROTECT BY LINNSIGMA');
+            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini. PROTECT BY JEREXD');
         }
     }
 
@@ -141,9 +141,83 @@ class FileController extends ClientApiController
         Activity::event('server:file.delete')->property('files', $request->input('files'))->log();
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
+
+    // 🔧 FUNGSI UNTUK UNARCHIVE/ARCHIVE FILE - TETAP ADA
+    public function compress(CompressFilesRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->compressFiles(
+            $request->input('root'),
+            $request->input('files')
+        );
+        Activity::event('server:file.compress')->property('files', $request->input('files'))->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function decompress(DecompressFilesRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->decompressFile(
+            $request->input('root'),
+            $request->input('file')
+        );
+        Activity::event('server:file.decompress')->property('file', $request->input('file'))->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function rename(RenameFileRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->renameFile(
+            $request->input('root'),
+            $request->input('rename_from'),
+            $request->input('rename_to')
+        );
+        Activity::event('server:file.rename')
+            ->property('old', $request->input('rename_from'))
+            ->property('new', $request->input('rename_to'))
+            ->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function copy(CopyFileRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->copyFile(
+            $request->input('location'),
+            $request->input('file')
+        );
+        Activity::event('server:file.copy')->property('file', $request->input('file'))->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function pull(PullFileRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->pullFile(
+            $request->input('url'),
+            $request->input('directory', '/'),
+            $request->input('filename'),
+            $request->input('use_header', false),
+            $request->input('foreground', false)
+        );
+        Activity::event('server:file.pull')->property('url', $request->input('url'))->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    public function chmod(ChmodFilesRequest $request, Server $server): JsonResponse
+    {
+        $this->checkServerAccess($server);
+        $this->fileRepository->setServer($server)->chmodFiles(
+            $request->input('root'),
+            $request->input('files')
+        );
+        Activity::event('server:file.chmod')->property('files', $request->input('files'))->log();
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
 }
 EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 7: Anti File Access installed!"
-echo "🔒 PROTECT BY LINNSIGMA"
+echo "🔒 PROTECT BY JEREXD"
