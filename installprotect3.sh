@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 3: Anti Location Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/LocationController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -50,7 +50,7 @@ class LocationController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses locations. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses locations.');
         }
 
         return $this->view->make('admin.locations.index', [
@@ -62,7 +62,7 @@ class LocationController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa melihat detail location. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa melihat detail location.');
         }
 
         return $this->view->make('admin.locations.view', [
@@ -74,7 +74,7 @@ class LocationController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa membuat location. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa membuat location.');
         }
 
         $location = $this->creationService->handle($request->normalize());
@@ -86,7 +86,7 @@ class LocationController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate location. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate location.');
         }
 
         if ($request->input('action') === 'delete') {
@@ -102,7 +102,7 @@ class LocationController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa menghapus location. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa menghapus location.');
         }
 
         $this->deletionService->handle($location->id);
@@ -114,4 +114,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 3: Anti Location Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
