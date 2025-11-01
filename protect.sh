@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Custom watermark dari parameter
-CUSTOM_WATERMARK="${1:-PROTECT BY LINNSIGMA}"
+CUSTOM_WATERMARK="${1:-PROTECT PANEL}"
 
 echo "=================================================="
 echo "🛡️  JEREPROTECTBOT - INSTALL ALL PROTECTION"
