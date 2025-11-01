@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 1: Anti Delete Server..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Services/Servers/ServerDeletionService.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -59,11 +59,11 @@ class ServerDeletionService
                     ?? ($server->user?->id ?? null);
 
                 if ($ownerId === null) {
-                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia. PROTECT BY JEREXD');
+                    throw new DisplayException('Akses ditolak: informasi pemilik server tidak tersedia.');
                 }
 
                 if ($ownerId !== $user->id) {
-                    throw new DisplayException('Akses ditolak: Anda hanya dapat menghapus server milik Anda sendiri. PROTECT BY JEREXD');
+                    throw new DisplayException('Akses ditolak: Anda hanya dapat menghapus server milik Anda sendiri.');
                 }
             }
         }
@@ -97,4 +97,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 1: Anti Delete Server installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
