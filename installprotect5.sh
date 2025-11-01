@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 5: Anti Nest Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/Nests/NestController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -49,7 +49,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuka menu Nests. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuka menu Nests.');
         }
 
         return $this->view->make('admin.nests.index', [
@@ -61,7 +61,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa melihat detail nest. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa melihat detail nest.');
         }
 
         return $this->view->make('admin.nests.view', [
@@ -73,7 +73,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest.');
         }
 
         return $this->view->make('admin.nests.new');
@@ -83,7 +83,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa membuat nest.');
         }
 
         $nest = $this->nestCreationService->handle($request->normalize());
@@ -95,7 +95,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa mengupdate nest. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa mengupdate nest.');
         }
 
         $this->nestUpdateService->handle($nest, $request->normalize());
@@ -107,7 +107,7 @@ class NestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa menghapus nest. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin utama (ID 1) yang bisa menghapus nest.');
         }
 
         $this->nestDeletionService->handle($nest);
@@ -119,4 +119,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 5: Anti Nest Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
