@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 6: Anti Settings Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/Settings/IndexController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -50,7 +50,7 @@ class IndexController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses settings. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengakses settings.');
         }
 
         return $this->view->make('admin.settings.index', [
@@ -63,7 +63,7 @@ class IndexController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate settings. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang bisa mengupdate settings.');
         }
 
         foreach ($request->normalize() as $key => $value) {
@@ -80,4 +80,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 6: Anti Settings Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
