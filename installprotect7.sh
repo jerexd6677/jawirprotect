@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 7: Anti File Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Api/Client/Servers/FileController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -61,7 +61,7 @@ class FileController extends ClientApiController
         }
 
         if ($server->owner_id !== $user->id) {
-            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Anda tidak memiliki akses ke server ini.');
         }
     }
 
@@ -220,4 +220,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 7: Anti File Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
