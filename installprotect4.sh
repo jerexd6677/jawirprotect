@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 4: Anti Node Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/Nodes/NodeController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -38,7 +38,7 @@ class NodeController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->id !== 1) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang dapat membuka menu Nodes. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya admin ID 1 yang dapat membuka menu Nodes.');
         }
 
         $nodes = QueryBuilder::for(
@@ -55,4 +55,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 4: Anti Node Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
