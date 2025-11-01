@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 2: Anti User Modification..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Admin/UserController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -90,7 +90,7 @@ class UserController extends Controller
     public function delete(Request $request, User $user): RedirectResponse
     {
         if ($request->user()->id !== 1) {
-            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain! PROTECT BY JEREXD");
+            throw new DisplayException("❌ Hanya admin ID 1 yang dapat menghapus user lain!");
         }
 
         if ($request->user()->id === $user->id) {
@@ -116,12 +116,12 @@ class UserController extends Controller
 
         foreach ($restrictedFields as $field) {
             if ($request->filled($field) && $request->user()->id !== 1) {
-                throw new DisplayException("⚠️ Data sensitif hanya bisa diubah oleh admin ID 1. PROTECT BY JEREXD");
+                throw new DisplayException("⚠️ Data sensitif hanya bisa diubah oleh admin ID 1.");
             }
         }
 
         if ($user->root_admin && $request->user()->id !== 1) {
-            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini. PROTECT BY JEREXD");
+            throw new DisplayException("🚫 Tidak dapat menurunkan hak admin pengguna ini.");
         }
 
         $this->updateService
@@ -155,4 +155,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 2: Anti User Modification installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
