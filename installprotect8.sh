@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "🚀 Installing Protect 8: Anti Server Access..."
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
 
 REMOTE_PATH="/var/www/pterodactyl/app/Http/Controllers/Api/Client/Servers/ServerController.php"
 BACKUP_PATH="${REMOTE_PATH}.backup_$(date +%Y%m%d_%H%M%S)"
@@ -41,7 +41,7 @@ class ServerController extends ClientApiController
         $authUser = Auth::user();
 
         if ($authUser->id !== 1 && (int) $server->owner_id !== (int) $authUser->id) {
-            throw new DisplayException('🚫 Akses ditolak! Hanya bisa melihat server milik sendiri. PROTECT BY JEREXD');
+            throw new DisplayException('🚫 Akses ditolak! Hanya bisa melihat server milik sendiri.');
         }
 
         return $this->fractal->item($server)
@@ -57,4 +57,4 @@ EOF
 
 chmod 644 "$REMOTE_PATH"
 echo "✅ PROTECT 8: Anti Server Access installed!"
-echo "🔒 PROTECT BY JEREXD"
+echo "🔒 PROTECT PANEL"
